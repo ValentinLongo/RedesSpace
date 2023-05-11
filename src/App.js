@@ -1,23 +1,72 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Planet } from "react-planet";
+import { Fab } from "@mui/material";
+import "./App.css";
+import sol from './assets/Sol.png'
 
-function App() {
+function App(props) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="app-container">
+      <div className="menu-container">
+        <Planet className="planet"
+          centerContent={
+            <Fab key="1" size="large" color="neutral"
+            style={{
+              backgroundImage: `url(${sol})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}>
+            </Fab>
+          }
+          hideOrbit
+          orbitRadius={150}
+          bounceOnClose
+          rotation={105}
+          bounceDirection="BOTTOM"
+          open
+          autoClose
         >
-          Learn React
-        </a>
-      </header>
+          <Fab
+            key='2'
+            variant="extended"
+            size="small"
+            color="neutral"
+            style={{
+              position: 'absolute',
+              top: '-100px',
+              left: '-100px'
+            }}
+          >
+            {'child1'}
+          </Fab>
+          <Fab
+            key='3'
+            variant="extended"
+            size="small"
+            color="neutral"
+            style={{
+              position: 'absolute',
+              top: '-100px',
+              left: '100px'
+            }}
+          >
+            {'child2'}
+          </Fab>
+          <Fab
+            key='4'
+            variant="extended"
+            size="small"
+            color="neutral"
+            style={{
+              position: 'absolute',
+              top: '100px',
+              left: '100px'
+            }}
+          >
+            {'child3'}
+          </Fab>
+        </Planet>
+      </div>
     </div>
   );
 }
