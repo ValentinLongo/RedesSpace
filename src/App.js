@@ -3,17 +3,18 @@ import { Planet } from "react-planet";
 import { Fab } from "@mui/material";
 import "./App.css";
 import sol from './assets/Sol.png'
-import { Button, Drawer, Space } from 'antd';
+import { Button, Drawer, Space,Form, Row, Col, Input } from 'antd';
 
 const planetas = [
-  {key:'2',name:'Marte',top: '-200px',left: '-200px',img: 'https://w7.pngwing.com/pngs/75/937/png-transparent-planet-earth-planet-mars-mercury-jupiter-mars-atmosphere-sphere-venus-thumbnail.png'},
-  {key:'3',name:'Jupiter',top: '200px',left: '-200px', img: 'https://w7.pngwing.com/pngs/322/728/png-transparent-jupiter-web-browser-computer-icons-jupiter-sphere-bitcoin-saturn.png'},
-  {key:'4',name:'Saturno',top: '-200px',left: '200px', img: 'https://w7.pngwing.com/pngs/390/722/png-transparent-saturn-saturn-s-rings-planet-universe-rings-astronomy-solar-system-sky-science-space.png'},
-  {key:'5',name:'Pluton',top: '200px',left: '200px', img: 'https://e7.pngegg.com/pngimages/743/958/png-clipart-new-horizons-pluto-s-heart-moons-of-pluto-pluto-planet-new-horizons-pluto-s-heart.png'}
+{Id:'2',nombre:'Marte',p_top: '-100px',p_left: '-100px', width:'80px',height:'80px',image: 'https://w7.pngwing.com/pngs/75/937/png-transparent-planet-earth-planet-mars-mercury-jupiter-mars-atmosphere-sphere-venus-thumbnail.png'},
+  {Id:'3',nombre:'Jupiter',p_top: '200px',p_left: '-200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/322/728/png-transparent-jupiter-web-browser-computer-icons-jupiter-sphere-bitcoin-saturn.png'},
+  {Id:'4',nombre:'Saturno',p_top: '-200px',p_left: '200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/390/722/png-transparent-saturn-saturn-s-rings-planet-universe-rings-astronomy-solar-system-sky-science-space.png'},
+  {Id:'5',nombre:'Pluton',p_top: '200px',p_left: '200px', width:'80px',height:'80px', image: 'https://e7.pngegg.com/pngimages/743/958/png-clipart-new-horizons-pluto-s-heart-moons-of-pluto-pluto-planet-new-horizons-pluto-s-heart.png'}
 ]
 
-function App(props) {
+function App() {
   const [open, setOpen] = useState(false);
+  const [agregarPlaneta, setAgregarPlaneta] = useState(''); 
 
   const showDrawer = () => {
     setOpen(true);
@@ -22,21 +23,73 @@ function App(props) {
   const onClose = () => {
     setOpen(false);
   };
+
+  const armarObjetoPlaneta = (values) =>{
+    return {
+      nombre: values.nombre || '',
+      p_left: values.p_left || '',
+      p_top: values.p_top || '',
+      height: values.height || '',
+      width: values.width || '',
+      image: values.image || ''
+    };
+  }
+
+  const nuevoPlaneta = () =>{
+    console.log(JSON.stringify(armarObjetoPlaneta(agregarPlaneta)));
+  }
   return (
     <div className="app-container">
-      <Drawer title="Basic Drawer" placement="right" onClose={onClose} open={open} 
-       extra={
+      <Drawer title="Agregar Planeta" width={500} placement="right" onClose={() => {onClose()}} open={open}
+        destroyOnClose = "true"
+        extra={ 
         <Space>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button onClick={onClose} type="primary">
-            Submit
-          </Button>
-        </Space>
-      }>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Drawer>
+        <Button onClick={onClose}>Cancelar</Button>
+        <Button onClick={() => {nuevoPlaneta()}} type="primary">
+            Aceptar
+        </Button>
+        </Space>}>
+        <Form layout="vertical" onValuesChange={(_, values) => setAgregarPlaneta(values)}>
+            <Row gutter={14}>
+            <Col span={24}>
+                <Form.Item name="nombre" label="Nombre" rules={[{ required: true, message: 'Porfavor, ingrese nombre' }]}>
+                <Input placeholder='Ingrese nombre del planeta'/>
+                </Form.Item>
+            </Col>
+            </Row>
+            <Row gutter={14}>
+            <Col span={12}>
+                <Form.Item name="p_left" label="Distancia lateral" rules={[{ required: true, message: 'Porfavor, ingrese distancia'}]}>
+                <Input placeholder='Distancia lateral en px'/>
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+            <Form.Item name="p_top" label="Distancia vertical" rules={[{ required: true, message: 'Porfavor, ingrese distancia'}]}>
+                <Input placeholder='Distancia vertical en px'/>
+            </Form.Item>
+            </Col>
+            </Row>
+            <Row gutter={14}>
+            <Col span={12}>
+                <Form.Item name="width" label="Ancho del planeta" rules={[{ required: true, message: 'Porfavor, ingrese ancho'}]}>
+                <Input placeholder='Ingrese ancho del planeta'/>
+                </Form.Item>
+            </Col>
+            <Col span={12}>
+                <Form.Item name="height" label="Altura del planeta" rules={[{ required: true, message: 'Porfavor, ingrese altura'}]}>
+                <Input placeholder='Ingrese altura del planeta'/>
+                </Form.Item>
+            </Col>
+            </Row>
+            <Row gutter={16}>
+            <Col span={24}>
+                <Form.Item name="image" label="Imagen" rules={[{ required: true, message: 'Porfavor, ingrese imagen'}]}>
+                <Input placeholder='Ingrese imagen del planeta'/>
+                </Form.Item>
+            </Col>
+            </Row>
+        </Form>
+        </Drawer>   
       <div className="menu-container">
         <Planet className="planet"
           centerContent={
@@ -60,16 +113,16 @@ function App(props) {
         >
          {planetas.map(planeta => (
           <Fab
-            key={planeta.key}
+            key={planeta.id}
             variant="extended"
             size="large"
             onClick={showDrawer}
             color="neutral"
             style={{
               position: 'absolute',
-              top: planeta.top,
-              left: planeta.left,
-              backgroundImage: `url(${planeta.img})`,
+              top: planeta.p_top,
+              left: planeta.p_left,
+              backgroundImage: `url(${planeta.image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
