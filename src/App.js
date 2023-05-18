@@ -11,6 +11,8 @@ function App() {
   const [open2, setOpen2] = useState(false);
   const [allPlanetas, setAllPlanetas] = useState([])
   const [agregarPlaneta, setAgregarPlaneta] = useState(''); 
+  const [modiPlaneta, setModiPlaneta] = useState({});
+  const [idPlaneta, setIdPlaneta] = useState(0);
 
   useEffect(() => {
     getPlanetas();
@@ -39,6 +41,12 @@ function App() {
     setOpen2(false);
   };
 
+  const onEdit = (record) => {
+    console.log(record)
+    setModiPlaneta(record);
+    setIdPlaneta(record.Id);
+    showDrawer2();
+  };
   const armarObjetoPlaneta = (values) =>{
     return {
       nombre: values.nombre || '',
@@ -76,6 +84,35 @@ function App() {
         console.error(error);
       });
   }
+
+  const modificarPlanetaEspecifico = () => {
+    const url = "https://api-planetas.vercel.app/api/planetas/" + idPlaneta; 
+    console.log(url)
+    // Realizar la solicitud POST y obtener la respuesta
+    console.log(JSON.stringify(armarObjetoPlaneta(modiPlaneta)));
+    fetch(url, {
+      method: "PUT",
+      body: JSON.stringify(armarObjetoPlaneta(modiPlaneta)),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(response => response.json())
+      .then(json => {
+        // Leer la respuesta de la API
+        if(json.message === 'Planeta actualizado correctamente'){ 
+          onClose2();
+          getPlanetas();
+          alert("Planeta modificado correctamente")
+        }
+        else{ //En caso de que sea incorrecto
+          console.log(json.message)
+        }
+      })
+      .catch(error => {
+        // Manejar errores de la solicitud
+        console.error(error);
+      });
+};
+
   return (
     <div className="app-container">
       <Drawer title="Agregar Planeta" width={500} placement="right" onClose={() => {onClose()}} open={open}
@@ -132,47 +169,47 @@ function App() {
         destroyOnClose = "true"
         extra={ 
         <Space>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={() => {nuevoPlaneta()}} type="primary">
+        <Button onClick={onClose2}>Cancelar</Button>
+        <Button onClick={() => {modificarPlanetaEspecifico()}} type="primary">
             Aceptar
         </Button>
         </Space>}>
-        <Form layout="vertical" onValuesChange={(_, values) => setAgregarPlaneta(values)}>
+        <Form layout="vertical" initialValues={modiPlaneta} onValuesChange={(_, values) => setModiPlaneta(values)}>
             <Row gutter={14}>
             <Col span={24}>
                 <Form.Item name="nombre" label="Nombre" rules={[{ required: true, message: 'Porfavor, ingrese nombre' }]}>
-                <Input placeholder='Ingrese nombre del planeta'/>
+                <Input defaultValue={modiPlaneta.nombre} placeholder='Ingrese nombre del planeta'/>
                 </Form.Item>
             </Col>
             </Row>
             <Row gutter={14}>
             <Col span={12}>
                 <Form.Item name="p_left" label="Distancia lateral" rules={[{ required: true, message: 'Porfavor, ingrese distancia'}]}>
-                <Input placeholder='Distancia lateral en px'/>
+                <Input defaultValue={modiPlaneta.p_left} placeholder='Distancia lateral en px'/>
                 </Form.Item>
             </Col>
             <Col span={12}>
             <Form.Item name="p_top" label="Distancia vertical" rules={[{ required: true, message: 'Porfavor, ingrese distancia'}]}>
-                <Input placeholder='Distancia vertical en px'/>
+                <Input defaultValue={modiPlaneta.p_top} placeholder='Distancia vertical en px'/>
             </Form.Item>
             </Col>
             </Row>
             <Row gutter={14}>
             <Col span={12}>
                 <Form.Item name="width" label="Ancho del planeta" rules={[{ required: true, message: 'Porfavor, ingrese ancho'}]}>
-                <Input placeholder='Ingrese ancho del planeta'/>
+                <Input defaultValue={modiPlaneta.width} placeholder='Ingrese ancho del planeta'/>
                 </Form.Item>
             </Col>
             <Col span={12}>
                 <Form.Item name="height" label="Altura del planeta" rules={[{ required: true, message: 'Porfavor, ingrese altura'}]}>
-                <Input placeholder='Ingrese altura del planeta'/>
+                <Input defaultValue={modiPlaneta.height} placeholder='Ingrese altura del planeta'/>
                 </Form.Item>
             </Col>
             </Row>
             <Row gutter={16}>
             <Col span={24}>
                 <Form.Item name="image" label="Imagen" rules={[{ required: true, message: 'Porfavor, ingrese imagen'}]}>
-                <Input placeholder='Ingrese imagen del planeta'/>
+                <Input defaultValue={modiPlaneta.image} placeholder='Ingrese imagen del planeta'/>
                 </Form.Item>
             </Col>
             </Row>
@@ -199,26 +236,26 @@ function App() {
           bounceDirection="BOTTOM"
           open
         >
-         {allPlanetas.map(allPlanetas => (
-          <Fab
-            key={allPlanetas.id}
-            variant="extended"
-            size="large"
-            onClick={showDrawer2}
-            color="neutral"
-            style={{
-              position: 'absolute',
-              top: allPlanetas.p_top,
-              left: allPlanetas.p_left,
-              width: allPlanetas.width,
-              height: allPlanetas.height,
-              borderRadius:'70%',
-              backgroundImage: `url(${allPlanetas.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-          </Fab>
+{allPlanetas.map((record) => (
+  <Fab
+    key={record.id}
+    variant="extended"
+    size="large"
+    onClick={() => onEdit(record)}
+    color="neutral"
+    style={{
+      position: 'absolute',
+      top: record.p_top,
+      left: record.p_left,
+      width: record.width,
+      height: record.height,
+      borderRadius: '70%',
+      backgroundImage: `url(${record.image})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }}
+  >
+  </Fab>
         ))}
         </Planet>
       </div>
