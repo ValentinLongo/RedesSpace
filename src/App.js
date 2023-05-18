@@ -1,20 +1,32 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Planet } from "react-planet";
 import { Fab } from "@mui/material";
 import "./App.css";
 import sol from './assets/Sol.png'
 import { Button, Drawer, Space,Form, Row, Col, Input } from 'antd';
 
-const planetas = [
-{Id:'2',nombre:'Marte',p_top: '-100px',p_left: '-100px', width:'80px',height:'80px',image: 'https://w7.pngwing.com/pngs/75/937/png-transparent-planet-earth-planet-mars-mercury-jupiter-mars-atmosphere-sphere-venus-thumbnail.png'},
-  {Id:'3',nombre:'Jupiter',p_top: '200px',p_left: '-200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/322/728/png-transparent-jupiter-web-browser-computer-icons-jupiter-sphere-bitcoin-saturn.png'},
-  {Id:'4',nombre:'Saturno',p_top: '-200px',p_left: '200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/390/722/png-transparent-saturn-saturn-s-rings-planet-universe-rings-astronomy-solar-system-sky-science-space.png'},
-  {Id:'5',nombre:'Pluton',p_top: '200px',p_left: '200px', width:'80px',height:'80px', image: 'https://e7.pngegg.com/pngimages/743/958/png-clipart-new-horizons-pluto-s-heart-moons-of-pluto-pluto-planet-new-horizons-pluto-s-heart.png'}
-]
+// const planetas = [
+// {Id:'2',nombre:'Marte',p_top: '-100px',p_left: '-100px', width:'80px',height:'80px',image: 'https://w7.pngwing.com/pngs/75/937/png-transparent-planet-earth-planet-mars-mercury-jupiter-mars-atmosphere-sphere-venus-thumbnail.png'},
+//   {Id:'3',nombre:'Jupiter',p_top: '200px',p_left: '-200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/322/728/png-transparent-jupiter-web-browser-computer-icons-jupiter-sphere-bitcoin-saturn.png'},
+//   {Id:'4',nombre:'Saturno',p_top: '-200px',p_left: '200px', width:'80px',height:'80px', image: 'https://w7.pngwing.com/pngs/390/722/png-transparent-saturn-saturn-s-rings-planet-universe-rings-astronomy-solar-system-sky-science-space.png'},
+//   {Id:'5',nombre:'Pluton',p_top: '200px',p_left: '200px', width:'80px',height:'80px', image: 'https://e7.pngegg.com/pngimages/743/958/png-clipart-new-horizons-pluto-s-heart-moons-of-pluto-pluto-planet-new-horizons-pluto-s-heart.png'}
+// ]
 
 function App() {
   const [open, setOpen] = useState(false);
+  const [allPlanetas, setAllPlanetas] = useState([])
   const [agregarPlaneta, setAgregarPlaneta] = useState(''); 
+
+  useEffect(() => {
+    getPlanetas();
+  }, []);
+
+  const getPlanetas = () =>{    
+    fetch('https://api-planetas.vercel.app/api/planetas')
+    .then(response => response.json())
+    .then(data => setAllPlanetas(data.data))
+    .catch(error => console.error(error)) 
+  }
 
   const showDrawer = () => {
     setOpen(true);
@@ -36,7 +48,30 @@ function App() {
   }
 
   const nuevoPlaneta = () =>{
+    const url = "https://api-planetas.vercel.app/api/planetas"; 
+    // Realizar la solicitud POST y obtener la respuesta
     console.log(JSON.stringify(armarObjetoPlaneta(agregarPlaneta)));
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify(armarObjetoPlaneta(agregarPlaneta)),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(response => response.json())
+      .then(json => {
+        // Leer la respuesta de la API
+        if(json.message === 'usuario created succefully'){ // Si el valor de message es "Usuario Correcto"
+          onClose();
+          getPlanetas();
+          alert("Usuario creado correctamente")
+        }
+        else{ //En caso de que sea incorrecto
+          console.log(json.message)
+        }
+      })
+      .catch(error => {
+        // Manejar errores de la solicitud
+        console.error(error);
+      });
   }
   return (
     <div className="app-container">
@@ -111,18 +146,18 @@ function App() {
           bounceDirection="BOTTOM"
           open
         >
-         {planetas.map(planeta => (
+         {allPlanetas.map(allPlanetas => (
           <Fab
-            key={planeta.id}
+            key={allPlanetas.id}
             variant="extended"
             size="large"
             onClick={showDrawer}
             color="neutral"
             style={{
               position: 'absolute',
-              top: planeta.p_top,
-              left: planeta.p_left,
-              backgroundImage: `url(${planeta.image})`,
+              top: allPlanetas.p_top,
+              left: allPlanetas.p_left,
+              backgroundImage: `url(${allPlanetas.image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
