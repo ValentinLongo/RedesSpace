@@ -3,7 +3,7 @@ import { Planet } from "react-planet";
 import { Fab } from "@mui/material";
 import "./App.css";
 import sol from './assets/Sol.png'
-import { Button, Drawer, Space,Form, Row, Col, Input } from 'antd';
+import { Button, Drawer, Space,Form, Row, Col, Input, message } from 'antd';
 
 
 function App() {
@@ -70,10 +70,36 @@ function App() {
       .then(response => response.json())
       .then(json => {
         // Leer la respuesta de la API
-        if(json.message === 'usuario created succefully'){ // Si el valor de message es "Usuario Correcto"
+        if(json.message === 'Planeta creado correctamente'){ // Si el valor de message es "Usuario Correcto"
           onClose();
           getPlanetas();
-          alert("Usuario creado correctamente")
+          message.success("Planeta creado correctamente");
+        }
+        else{ //En caso de que sea incorrecto
+          console.log(json.message)
+        }
+      })
+      .catch(error => {
+        // Manejar errores de la solicitud
+        console.error(error);
+      });
+  }
+
+  const eliminarPlaneta = () =>{
+    const url = "https://api-planetas.vercel.app/api/planetas/" + idPlaneta; 
+    console.log(url)
+    // Realizar la solicitud POST y obtener la respuesta
+    fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(response => response.json())
+      .then(json => {
+        // Leer la respuesta de la API
+        if(json.message === 'Planeta eliminado correctamente'){ 
+          onClose2();
+          getPlanetas();
+          message.success("Planeta eliminado correctamente");
         }
         else{ //En caso de que sea incorrecto
           console.log(json.message)
@@ -101,7 +127,7 @@ function App() {
         if(json.message === 'Planeta actualizado correctamente'){ 
           onClose2();
           getPlanetas();
-          alert("Planeta modificado correctamente")
+          message.success("Planeta modificado correctamente");
         }
         else{ //En caso de que sea incorrecto
           console.log(json.message)
@@ -210,6 +236,15 @@ function App() {
             <Col span={24}>
                 <Form.Item name="image" label="Imagen" rules={[{ required: true, message: 'Porfavor, ingrese imagen'}]}>
                 <Input defaultValue={modiPlaneta.image} placeholder='Ingrese imagen del planeta'/>
+                </Form.Item>
+            </Col>
+            </Row>
+            <Row gutter={16}>
+            <Col span={24}>
+                <Form.Item>
+                <Button onClick={() => {eliminarPlaneta()}} style={{ width: '100%' }} type="primary" danger>
+                  Eliminar planeta
+                </Button>
                 </Form.Item>
             </Col>
             </Row>
