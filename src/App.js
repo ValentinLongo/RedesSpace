@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import { Planet } from "react-planet";
 import { Fab } from "@mui/material";
 import "./App.css";
@@ -13,6 +13,7 @@ function App() {
   const [agregarPlaneta, setAgregarPlaneta] = useState(''); 
   const [modiPlaneta, setModiPlaneta] = useState({});
   const [idPlaneta, setIdPlaneta] = useState(0);
+  const formRef = useRef(null);
 
   useEffect(() => {
     getPlanetas();
@@ -146,11 +147,17 @@ function App() {
         extra={ 
         <Space>
         <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={() => {nuevoPlaneta()}} type="primary">
-            Aceptar
+        <Button onClick={() => {
+          formRef.current.validateFields().then(values => {
+            nuevoPlaneta();
+          }).catch(error => {
+            message.error('Por favor, complete todos los campos requeridos.');
+          });
+        }} type="primary">
+          Aceptar
         </Button>
         </Space>}>
-        <Form layout="vertical" onValuesChange={(_, values) => setAgregarPlaneta(values)}>
+        <Form layout="vertical" ref={formRef} onValuesChange={(_, values) => setAgregarPlaneta(values)}>
             <Row gutter={14}>
             <Col span={24}>
                 <Form.Item name="nombre" label="Nombre" rules={[{ required: true, message: 'Porfavor, ingrese nombre' }]}>
